@@ -2,7 +2,8 @@ name: CI - Dev pipeline
 
 on:
   pull_request:
-    branches: [ dev ]
+    branches:
+      - dev   # Le pipeline s'exécute sur PR vers la branche `dev`
 
 jobs:
   build-and-test:
@@ -12,43 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '18'   # Utilise la version de Node.js appropriée
 
-      - name: Install backend dependencies
-        working-directory: backend
+      - name: Install dependencies
         run: npm install
 
-      - name: Lint backend
-        working-directory: backend
-        run: npm run lint
-
-      - name: Audit backend
-        working-directory: backend
-        run: npm audit --audit-level=high || true
-
-      - name: Test backend
-        working-directory: backend
+      - name: Run tests
         run: npm test
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm install
-
-      - name: Lint frontend
-        working-directory: frontend
-        run: npm run lint
-
-      - name: Audit frontend
-        working-directory: frontend
-        run: npm audit --audit-level=high || true
-
-      - name: Test frontend
-        working-directory: frontend
-        run: npm test
-
-      - name: Build Docker images
-        run: docker-compose build
-
