@@ -1,0 +1,32 @@
+name: CD - Main deployment
+
+on:
+  push:
+    branches: 
+      - main  # Déclenchement sur push vers la branche `main`
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Récupère le code du dépôt
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2  # Configure Docker Buildx pour l'optimisation des builds
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        # Utilisation des secrets DOCKER_USERNAME et DOCKER_PASSWORD pour l'authentification à Docker Hub
+
+      - name: Build and push backend Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo:backend ./backend  # Build l'image du backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo:backend  # Push l'image vers Docker Hub
+
+      - name: Build and push frontend Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo:frontend ./frontend  # Build l'image du frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/ci-cd-demo:frontend  # Push l'image vers Docker Hub
+
